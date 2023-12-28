@@ -9,7 +9,7 @@ public class configFile {
     //Get the current working directory
     public String currentDirectory = System.getProperty("user.dir");
     //Sets the config path
-    public String configPath = currentDirectory + "\\config.txt";
+    public String configPath = currentDirectory + "/config.txt";
     //Converts String configPath to Path pConfigPath
     public Path pConfigPath = Paths.get(configPath);
     //FTP Parameters

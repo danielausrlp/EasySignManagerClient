@@ -32,7 +32,7 @@ public class ftpManager {
 
 
         } catch (Exception ex){
-            JOptionPane.showMessageDialog(null,"Couldn't connect to FTP Server. " + client.getReplyString());
+            JOptionPane.showMessageDialog(null,"Couldn't connect to FTP Server. ");
             client = null;
             return -1;
         }
