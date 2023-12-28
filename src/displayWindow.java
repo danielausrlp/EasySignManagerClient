@@ -1,9 +1,6 @@
-import javax.imageio.ImageIO;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 
 
 //Display class for displaying the picture, make sure to call setVisible()
@@ -54,30 +51,5 @@ public class displayWindow extends JFrame {
         getContentPane().setCursor(blankCursor);
     }
 
-    //Debug constructor
-    displayWindow(int i){
-
-        try{
-            setExtendedState(JFrame.MAXIMIZED_BOTH);
-            setUndecorated(true);
-            setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-
-            Image img = ImageIO.read(new File("C:\\Users\\Daniel\\Desktop\\E8e_HQ5X0AgS509.png"));
-            Image s_img = img.getScaledInstance(width,height,Image.SCALE_SMOOTH);
-
-            Icon ic = new ImageIcon(s_img);
-            lPicture = new JLabel(ic);
-            add(lPicture);
-
-        } catch (IOException ex){
-            JOptionPane.showMessageDialog(null,"Error loading the Picture.");
-            return;
-        }
-
-
-
-
-
-    }
 
 }

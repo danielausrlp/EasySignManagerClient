@@ -46,6 +46,7 @@ public class ftpManager {
 
         Image temp;
 
+        //Kill program if connection failed
         if(openConnection(configFtp) == -1)
             System.exit(-1);
 
@@ -75,6 +76,42 @@ public class ftpManager {
 
 
         return temp;
+    }
+
+    //Get the client config from the server and returns the string.
+    public String getClientConfigFromFtpServer() {
+
+        String temp;
+
+        //Kill program if connection failed
+        if(openConnection(configFtp) == -1){
+            System.exit(-1);
+        }
+
+        try{
+
+           String[] names = client.listNames("/"+ configFtp.roomId);
+
+           for(String s : names){
+
+               if(s.contains("config.txt")){
+                   InputStream is = client.retrieveFileStream("/"+ configFtp.roomId + "/config.txt");
+                   BufferedReader br = new BufferedReader(new InputStreamReader(is));
+
+                   temp = br.readLine();
+                   System.out.println(temp);
+
+                   return temp;
+               }
+
+           }
+        } catch (Exception ex){
+            JOptionPane.showMessageDialog(null,ex.getMessage());
+            return null;
+        }
+
+
+        return null;
     }
 
 }

@@ -15,6 +15,7 @@ public class configFile {
     //FTP Parameters
     public String ftpAddress,ftpUsername,ftpPassword,roomId;
 
+
     //Calls both functions to initialize parameters properly
     configFile(){
         formatConfigAndInitializeParameters(loadConfigFromFile());
@@ -68,5 +69,6 @@ public class configFile {
 
 
     }
+
 
 }
