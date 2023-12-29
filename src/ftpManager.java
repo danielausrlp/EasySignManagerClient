@@ -78,6 +78,50 @@ public class ftpManager {
         return temp;
     }
 
+    //Get the date reserved image from the FTP Server
+    public Image getReservedImageFromFtpServer(){
+
+        Image temp;
+
+        //Kill program if connection failed
+        if(openConnection(configFtp) == -1)
+            System.exit(-1);
+
+        try{
+
+            InputStream is = client.retrieveFileStream("/"+ configFtp.roomId + "/" + "bild2.png");
+            BufferedInputStream bs = new BufferedInputStream(is);
+            temp = ImageIO.read(bs);
+            is.close();
+            bs.close();
+            //WTF?
+            System.gc();
+            client.disconnect();
+
+            if(temp == null){
+                JOptionPane.showMessageDialog(null,"Error in saving image. " + client.getReplyString());
+                client.disconnect();
+                return null;
+            }
+
+
+        } catch (Exception ex){
+            JOptionPane.showMessageDialog(null,"Couldn't download image from FTP Server. " + client.getReplyString());
+            System.out.println(ex.getMessage());
+            return null;
+        }
+
+
+        return temp;
+    }
+
+    //Uploads the new server-sided config file after successful download of the date reserved image and deletes the old temp image and replaces the new one
+    //Deletes the date from the server-sided config to uncheck the box in the main esm
+    //TODO: implement
+    public void cleanUpAfterReservedImageDownload(){
+
+    }
+
     //Get the client config from the server and returns the string.
     public String getClientConfigFromFtpServer() {
 

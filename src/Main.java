@@ -1,3 +1,4 @@
+import javax.swing.*;
 import java.util.concurrent.TimeUnit;
 
 public class Main{
@@ -22,10 +23,13 @@ public class Main{
 
             try{
                 w1.updateImage(ftp.getImageFromFtpServer());
-                ftp.getClientConfigFromFtpServer();
+                configFromFtp = new clientConfigFile(ftp.getClientConfigFromFtpServer());
                 TimeUnit.SECONDS.sleep(configFromFtp.updateInterval);
+                //Just in case, i don't trust java
+                System.gc();
 
             } catch (Exception ex){
+                System.out.println(ex.getMessage());
                 System.exit(-1);
             }
 
