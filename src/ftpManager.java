@@ -1,7 +1,11 @@
 import org.apache.commons.net.ftp.*;
+
+import javax.imageio.stream.ImageInputStream;
 import javax.swing.*;
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.*;
+import java.text.FieldPosition;
 import javax.imageio.ImageIO;
 
 
@@ -14,6 +18,7 @@ public class ftpManager {
     }
 
     //Tries to open an FTP connection, returns 0 on success, -1 on failure
+    //make sure to disconnect after usage
     private int openConnection(configFile cf) {
 
         client = new FTPClient();
@@ -115,10 +120,115 @@ public class ftpManager {
         return temp;
     }
 
+    //whatever
+    public byte[] getBytesFromReservedImage() {
+
+        byte[] temp;
+
+        //Kill program if connection failed
+        if(openConnection(configFtp) == -1)
+            System.exit(-1);
+
+        try{
+
+            InputStream is = client.retrieveFileStream("/"+ configFtp.roomId + "/" + "bild2.png");
+            BufferedInputStream bs = new BufferedInputStream(is);
+            temp = bs.readAllBytes();
+            is.close();
+            bs.close();
+            //WTF?
+            System.gc();
+            client.disconnect();
+
+            if(temp == null){
+                JOptionPane.showMessageDialog(null,"Error in saving image. " + client.getReplyString());
+                client.disconnect();
+                return null;
+            }
+
+
+        } catch (Exception ex){
+            JOptionPane.showMessageDialog(null,"Couldn't download image from FTP Server. " + client.getReplyString());
+            System.out.println(ex.getMessage());
+            return null;
+        }
+
+        return temp;
+    }
+
     //Uploads the new server-sided config file after successful download of the date reserved image and deletes the old temp image and replaces the new one
     //Deletes the date from the server-sided config to uncheck the box in the main esm
-    //TODO: implement
-    public void cleanUpAfterReservedImageDownload(){
+    public void cleanUpAfterReservedImageDownload(clientConfigFile ccf){
+
+        String remoteConfig = "/"+ configFtp.roomId + "/" + "config.txt";
+        String remoteImage = "/" + configFtp.roomId + "/" + "bild.png";
+        String remoteTempImage = "/" + configFtp.roomId + "/" + "bild2.png";
+
+        if(openConnection(configFtp) == -1)
+            System.exit(-1);
+
+        byte[] data = getBytesFromReservedImage(); //bullshit
+
+        //Changing the main image and deleting the temporary
+        if(openConnection(configFtp) == -1)
+            System.exit(-1);
+
+        try{
+
+            if(openConnection(configFtp) == -1)
+                System.exit(-1);
+
+            ByteArrayInputStream bis = new ByteArrayInputStream(data);
+            client.setFileType(FTP.BINARY_FILE_TYPE);
+            client.storeFile(remoteImage, bis);
+
+
+            if(openConnection(configFtp) == -1)
+                System.exit(-1);
+
+
+            if(!client.deleteFile(remoteTempImage)){
+                client.disconnect();
+                System.out.println("Couldn't delete the temporary image from the FTP Server.");
+                throw new Exception();
+            }
+
+            client.disconnect();
+
+
+
+        } catch (Exception ex){
+            JOptionPane.showMessageDialog(null,"Couldn't change the temporary image." + client.getReplyString());
+            System.out.println(ex.getMessage());
+            System.exit(-1);
+        }
+
+
+        //Rewriting the config file
+        if(openConnection(configFtp) == -1)
+            System.exit(-1);
+
+        try {
+
+            InputStream is = new ByteArrayInputStream(ccf.getClientConfigWithoutDate().getBytes());
+            if(!client.storeFile(remoteConfig,is)){
+                client.disconnect();
+                is.close();
+                System.out.println("Couldn't store the server-sided config to the FTP Server.");
+                throw new Exception();
+            }
+            client.disconnect();
+            is.close();
+
+        } catch (Exception ex){
+            JOptionPane.showMessageDialog(null,"Couldn't change the server-sided config. " + client.getReplyString());
+            System.out.println(ex.getMessage());
+            System.exit(-1);
+            return;
+        }
+
+
+
 
     }
 

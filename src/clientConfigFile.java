@@ -64,4 +64,11 @@ public class clientConfigFile {
 
     }
 
+    //just returns the updateInterval as a string for now
+    public String getClientConfigWithoutDate() {
+
+        dateWithTime = ""; //not sure if needed, but whatever
+        return String.valueOf(updateInterval);
+    }
+
 }

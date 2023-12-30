@@ -22,11 +22,19 @@ public class Main{
         for(;;){
 
             try{
-                w1.updateImage(ftp.getImageFromFtpServer());
-                configFromFtp = new clientConfigFile(ftp.getClientConfigFromFtpServer());
+
+
+                if(configFromFtp.isTimeOver()){ //it fucking works
+                    ftp.cleanUpAfterReservedImageDownload(configFromFtp);
+                    w1.updateImage(ftp.getImageFromFtpServer());
+                } else {
+                    w1.updateImage(ftp.getImageFromFtpServer());
+                    configFromFtp = new clientConfigFile(ftp.getClientConfigFromFtpServer());
+                    //Just in case, i don't trust java
+                    System.gc();
+                }
+
                 TimeUnit.SECONDS.sleep(configFromFtp.updateInterval);
-                //Just in case, i don't trust java
-                System.gc();
 
             } catch (Exception ex){
                 System.out.println(ex.getMessage());
