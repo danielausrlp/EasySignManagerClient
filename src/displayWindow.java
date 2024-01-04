@@ -14,6 +14,8 @@ public class displayWindow extends JFrame {
     int width = (int)screenSize.getWidth();
     int height = (int)screenSize.getHeight();
 
+
+
     Icon ic;
 
 
@@ -26,11 +28,17 @@ public class displayWindow extends JFrame {
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         hideCursor();
 
+        //stupid linux fulls screen
+        GraphicsEnvironment graphics = GraphicsEnvironment.getLocalGraphicsEnvironment();
+        GraphicsDevice device = graphics.getDefaultScreenDevice();
+
         Image s_img = img.getScaledInstance(width,height,Image.SCALE_SMOOTH);
 
         ic = new ImageIcon(s_img);
         lPicture = new JLabel(ic);
         add(lPicture);
+
+        device.setFullScreenWindow(this);
 
     }
 
