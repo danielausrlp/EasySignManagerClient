@@ -1,4 +1,5 @@
-client now working on windows, need to check on linux
+client now working on windows
+
 needs a config.txt in the applicition directory with following format:
 ftpserveraddress;username;password;roomname
 
