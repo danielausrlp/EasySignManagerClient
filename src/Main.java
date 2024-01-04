@@ -1,4 +1,6 @@
-import javax.swing.*;
+import java.lang.management.ManagementFactory;
+import java.lang.management.MemoryMXBean;
+import java.lang.management.MemoryUsage;
 import java.util.concurrent.TimeUnit;
 
 public class Main{
@@ -23,13 +25,22 @@ public class Main{
 
             try{
 
+                int megabyte = 1024*1024;
+
+                MemoryMXBean mB = ManagementFactory.getMemoryMXBean();
+                MemoryUsage mU = mB.getHeapMemoryUsage();
+                long maxMemory = mU.getMax() / megabyte;
+                long usedMemory = mU.getUsed() / megabyte;
 
                 if(configFromFtp.isTimeOver()){ //it fucking works
                     ftp.cleanUpAfterReservedImageDownload(configFromFtp);
                     w1.updateImage(ftp.getImageFromFtpServer());
+                    System.out.println("Max Memory: " + maxMemory + " Used Memory: " + usedMemory);
+
                 } else {
                     w1.updateImage(ftp.getImageFromFtpServer());
                     configFromFtp = new clientConfigFile(ftp.getClientConfigFromFtpServer());
+                    System.out.println("Max Memory: " + maxMemory + " Used Memory: " + usedMemory);
                     //Just in case, i don't trust java
                     System.gc();
                 }

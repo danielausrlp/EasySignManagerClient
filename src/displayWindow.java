@@ -20,7 +20,7 @@ public class displayWindow extends JFrame {
 
 
     //Main constructor
-    displayWindow(Image img){
+    displayWindow(BufferedImage img){
 
         //Maximize the JFrame and disabling bar + border
         setExtendedState(JFrame.MAXIMIZED_BOTH);
@@ -28,13 +28,20 @@ public class displayWindow extends JFrame {
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         hideCursor();
 
-        //stupid linux fulls screen
+        //stupid linux full screen
         GraphicsEnvironment graphics = GraphicsEnvironment.getLocalGraphicsEnvironment();
         GraphicsDevice device = graphics.getDefaultScreenDevice();
 
-        Image s_img = img.getScaledInstance(width,height,Image.SCALE_SMOOTH);
+        assert(img != null);
+        //Image s_img = img.getScaledInstance(width,height,Image.SCALE_SMOOTH);
 
-        ic = new ImageIcon(s_img);
+        BufferedImage resizedImage = new BufferedImage(width,height,BufferedImage.TYPE_INT_RGB);
+        Graphics2D g2d = resizedImage.createGraphics();
+        g2d.drawImage(img,0,0,width,height,null);
+        g2d.dispose();
+
+
+        ic = new ImageIcon(resizedImage);
         lPicture = new JLabel(ic);
         add(lPicture);
 
@@ -45,8 +52,12 @@ public class displayWindow extends JFrame {
     //Updates the image and the display window HOPEFULLY
     public void updateImage(Image img){
 
-        Image s_img = img.getScaledInstance(width,height,Image.SCALE_SMOOTH);
-        ic = new ImageIcon(s_img);
+        //Image s_img = img.getScaledInstance(width,height,Image.SCALE_SMOOTH);
+        BufferedImage resizedImage = new BufferedImage(width,height,BufferedImage.TYPE_INT_RGB);
+        Graphics2D g2d = resizedImage.createGraphics();
+        g2d.drawImage(img,0,0,width,height,null);
+        g2d.dispose();
+        ic = new ImageIcon(resizedImage);
         lPicture.setIcon(ic);
         System.gc();
 

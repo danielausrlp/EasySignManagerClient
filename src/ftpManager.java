@@ -1,11 +1,8 @@
 import org.apache.commons.net.ftp.*;
-
-import javax.imageio.stream.ImageInputStream;
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.*;
-import java.text.FieldPosition;
 import javax.imageio.ImageIO;
 
 
@@ -47,9 +44,9 @@ public class ftpManager {
     }
 
     //Get the image from the FTP Server
-    public Image getImageFromFtpServer(){
+    public BufferedImage getImageFromFtpServer(){
 
-        Image temp;
+        BufferedImage temp;
 
         //Kill program if connection failed
         if(openConnection(configFtp) == -1)
@@ -57,9 +54,12 @@ public class ftpManager {
 
         try{
 
+            //utterly retarded
+            client.setFileType(FTP.BINARY_FILE_TYPE);
             InputStream is = client.retrieveFileStream("/"+ configFtp.roomId + "/" + "bild.png");
             BufferedInputStream bs = new BufferedInputStream(is);
-            temp = ImageIO.read(bs);
+            temp = convertBufferedInputStreamToPng(bs);
+
             is.close();
             bs.close();
             //WTF?
@@ -67,15 +67,14 @@ public class ftpManager {
             client.disconnect();
 
             if(temp == null){
-                JOptionPane.showMessageDialog(null,"Error in saving image. " + client.getReplyString());
+                System.out.println("Error in saving image. Why is img == null??");
                 client.disconnect();
                 return null;
             }
 
-
         } catch (Exception ex){
-            JOptionPane.showMessageDialog(null,"Couldn't download image from FTP Server. " + client.getReplyString());
-            System.out.println(ex.getMessage());
+            //JOptionPane.showMessageDialog(null,"Couldn't download image from FTP Server. " + ex.getMessage());
+            System.out.println("Couldn't download image from FTP Server. " + ex.getMessage());
             return null;
         }
 
@@ -83,7 +82,7 @@ public class ftpManager {
         return temp;
     }
 
-    //Get the date reserved image from the FTP Server
+    //Get the date reserved image from the FTP Server NOT USED
     public Image getReservedImageFromFtpServer(){
 
         Image temp;
@@ -131,25 +130,26 @@ public class ftpManager {
 
         try{
 
+            client.setFileType(FTP.BINARY_FILE_TYPE);
             InputStream is = client.retrieveFileStream("/"+ configFtp.roomId + "/" + "bild2.png");
             BufferedInputStream bs = new BufferedInputStream(is);
             temp = bs.readAllBytes();
             is.close();
             bs.close();
-            //WTF?
             System.gc();
             client.disconnect();
 
             if(temp == null){
-                JOptionPane.showMessageDialog(null,"Error in saving image. " + client.getReplyString());
+                //JOptionPane.showMessageDialog(null,"Error in saving image. " + client.getReplyString());
+                System.out.println("Error in saving image. " + client.getReplyString());
                 client.disconnect();
                 return null;
             }
 
 
         } catch (Exception ex){
-            JOptionPane.showMessageDialog(null,"Couldn't download image from FTP Server. " + client.getReplyString());
-            System.out.println(ex.getMessage());
+            //JOptionPane.showMessageDialog(null,"Couldn't download image from FTP Server. " + client.getReplyString());
+            System.out.println("Couldn't download image from FTP Server. " + ex.getMessage());
             return null;
         }
 
@@ -168,6 +168,8 @@ public class ftpManager {
             System.exit(-1);
 
         byte[] data = getBytesFromReservedImage(); //bullshit
+        data = convertByteArrayToPng(data);
+
 
         //Changing the main image and deleting the temporary
         if(openConnection(configFtp) == -1)
@@ -198,8 +200,8 @@ public class ftpManager {
 
 
         } catch (Exception ex){
-            JOptionPane.showMessageDialog(null,"Couldn't change the temporary image." + client.getReplyString());
-            System.out.println(ex.getMessage());
+            //JOptionPane.showMessageDialog(null,"Couldn't change the temporary image." + client.getReplyString());
+            System.out.println("Couldn't change the temporary image." + ex.getMessage());
             System.exit(-1);
         }
 
@@ -221,10 +223,10 @@ public class ftpManager {
             is.close();
 
         } catch (Exception ex){
-            JOptionPane.showMessageDialog(null,"Couldn't change the server-sided config. " + client.getReplyString());
-            System.out.println(ex.getMessage());
+            //JOptionPane.showMessageDialog(null,"Couldn't change the server-sided config. " + client.getReplyString());
+            System.out.println("Couldn't change the server-sided config. " + ex.getMessage());
             System.exit(-1);
-            return;
+
         }
 
 
@@ -267,5 +269,48 @@ public class ftpManager {
 
         return null;
     }
+
+    //converts a bufferedinputstream to a png format picture
+    public BufferedImage convertBufferedInputStreamToPng(BufferedInputStream bs){
+
+        try{
+            BufferedImage temp;
+
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            temp = ImageIO.read(bs);
+            ImageIO.write(temp,"png",baos);
+            ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+            baos.close();
+            bais.close();
+            return ImageIO.read(bais);
+
+        } catch (IOException ex){
+            System.out.println( "Error converting BufferedInputStream to png."+ ex.getMessage());
+            return null;
+        }
+
+    }
+
+    //converts a byte[] to a byte[] with png formatting
+    public byte[] convertByteArrayToPng(byte[] data){
+
+        try{
+
+            ByteArrayInputStream bais = new ByteArrayInputStream(data);
+            BufferedImage temp = ImageIO.read(bais);
+            ByteArrayOutputStream baos = new ByteArrayOutputStream();
+            ImageIO.write(temp,"png",baos);
+            return baos.toByteArray();
+
+        } catch (IOException ex) {
+            System.out.println( "Error converting byte[] to png."+ ex.getMessage());
+            return null;
+        }
+
+
+
+    }
+
+
 
 }
