@@ -300,6 +300,8 @@ public class ftpManager {
             BufferedImage temp = ImageIO.read(bais);
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             ImageIO.write(temp,"png",baos);
+            bais.close();
+            baos.close();
             return baos.toByteArray();
 
         } catch (IOException ex) {
