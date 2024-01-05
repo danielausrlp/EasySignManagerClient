@@ -7,8 +7,6 @@ public class Main{
 
 
     public static configFile config = new configFile();
-
-
     public static ftpManager ftp = new ftpManager(config);
 
     //Manages the server sided config from the FTP Server
