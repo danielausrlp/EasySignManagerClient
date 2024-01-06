@@ -23,6 +23,7 @@ public class ftpManager {
         try{
 
             client.connect(cf.ftpAddress);
+            client.enterLocalPassiveMode();
             client.login(cf.ftpUsername,cf.ftpPassword);
             System.out.println(client.getReplyString());
 
@@ -54,6 +55,7 @@ public class ftpManager {
 
         try{
 
+
             //utterly retarded
             client.setFileType(FTP.BINARY_FILE_TYPE);
             InputStream is = client.retrieveFileStream("/"+ configFtp.roomId + "/" + "bild.png");
@@ -62,19 +64,26 @@ public class ftpManager {
 
             is.close();
             bs.close();
-            //WTF?
             System.gc();
+            client.logout();
             client.disconnect();
 
             if(temp == null){
                 System.out.println("Error in saving image. Why is img == null??");
-                client.disconnect();
                 return null;
             }
 
         } catch (Exception ex){
             //JOptionPane.showMessageDialog(null,"Couldn't download image from FTP Server. " + ex.getMessage());
             System.out.println("Couldn't download image from FTP Server. " + ex.getMessage());
+
+            try{
+                client.logout();
+                client.disconnect();
+            } catch (IOException exx){
+                System.exit(-1);
+            }
+
             return null;
         }
 
@@ -93,17 +102,20 @@ public class ftpManager {
 
         try{
 
+
+
             InputStream is = client.retrieveFileStream("/"+ configFtp.roomId + "/" + "bild2.png");
             BufferedInputStream bs = new BufferedInputStream(is);
             temp = ImageIO.read(bs);
             is.close();
             bs.close();
-            //WTF?
             System.gc();
+            client.logout();
             client.disconnect();
 
             if(temp == null){
                 JOptionPane.showMessageDialog(null,"Error in saving image. " + client.getReplyString());
+                client.logout();
                 client.disconnect();
                 return null;
             }
@@ -137,12 +149,12 @@ public class ftpManager {
             is.close();
             bs.close();
             System.gc();
+            client.logout();
             client.disconnect();
 
             if(temp == null){
                 //JOptionPane.showMessageDialog(null,"Error in saving image. " + client.getReplyString());
                 System.out.println("Error in saving image. " + client.getReplyString());
-                client.disconnect();
                 return null;
             }
 
@@ -150,6 +162,14 @@ public class ftpManager {
         } catch (Exception ex){
             //JOptionPane.showMessageDialog(null,"Couldn't download image from FTP Server. " + client.getReplyString());
             System.out.println("Couldn't download image from FTP Server. " + ex.getMessage());
+
+            try{
+                client.logout();
+                client.disconnect();
+            } catch (IOException exx){
+                System.exit(-1);
+            }
+
             return null;
         }
 
@@ -190,11 +210,12 @@ public class ftpManager {
 
 
             if(!client.deleteFile(remoteTempImage)){
+                client.logout();
                 client.disconnect();
                 System.out.println("Couldn't delete the temporary image from the FTP Server.");
                 throw new Exception();
             }
-
+            client.logout();
             client.disconnect();
 
 
@@ -214,11 +235,13 @@ public class ftpManager {
 
             InputStream is = new ByteArrayInputStream(ccf.getClientConfigWithoutDate().getBytes());
             if(!client.storeFile(remoteConfig,is)){
+                client.logout();
                 client.disconnect();
                 is.close();
                 System.out.println("Couldn't store the server-sided config to the FTP Server.");
                 throw new Exception();
             }
+            client.logout();
             client.disconnect();
             is.close();
 
@@ -246,7 +269,13 @@ public class ftpManager {
 
         try{
 
-           String[] names = client.listNames("/"+ configFtp.roomId);
+            if(client.getReplyString().contains("425")){
+                JOptionPane.showMessageDialog(null,"wtf.");
+                client = null;
+                return null;
+            }
+
+            String[] names = client.listNames("/"+ configFtp.roomId);
 
            for(String s : names){
 
@@ -254,9 +283,16 @@ public class ftpManager {
                    InputStream is = client.retrieveFileStream("/"+ configFtp.roomId + "/config.txt");
                    BufferedReader br = new BufferedReader(new InputStreamReader(is));
 
+                   if(client.getReplyString().contains("425")){
+                       JOptionPane.showMessageDialog(null,"wtf.");
+                       client = null;
+                       return null;
+                   }
+
                    temp = br.readLine();
                    System.out.println(temp);
-
+                   client.logout();
+                   client.disconnect();
                    return temp;
                }
 

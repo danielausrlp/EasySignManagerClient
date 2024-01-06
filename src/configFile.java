@@ -1,13 +1,25 @@
 import javax.swing.*;
 import java.io.*;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.CodeSource;
 
 public class configFile {
 
     //Get the current working directory
-    public String currentDirectory = System.getProperty("user.dir");
+    public String currentDirectory;
+    {
+        try {
+
+            CodeSource codeSource = getClass().getProtectionDomain().getCodeSource();
+            File jarFile = new File(codeSource.getLocation().toURI().getPath());
+            currentDirectory = jarFile.getParentFile().getPath();
+        } catch (URISyntaxException e) {
+            throw new RuntimeException(e);
+        }
+    }
     //Sets the config path
     public String configPath = currentDirectory + "/config.txt";
     //Converts String configPath to Path pConfigPath

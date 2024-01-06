@@ -37,6 +37,7 @@ public class Main{
                     w1.updateImage(ftp.getImageFromFtpServer());
                     System.out.println("Max Memory: " + maxMemory + " Used Memory: " + usedMemory);
 
+
                 } else {
                     w1.updateImage(ftp.getImageFromFtpServer());
                     configFromFtp = new clientConfigFile(ftp.getClientConfigFromFtpServer());
