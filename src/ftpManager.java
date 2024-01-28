@@ -28,15 +28,17 @@ public class ftpManager {
             System.out.println(client.getReplyString());
 
             if(client.getReplyString().contains("530")){
-                JOptionPane.showMessageDialog(null,"Credentials to the FTP Server are incorrect.");
+                //JOptionPane.showMessageDialog(null,"Credentials to the FTP Server are incorrect.");
+                System.out.println("Credentials to the FTP Server are incorrect.");
                 client = null;
                 return -1;
             }
 
 
         } catch (Exception ex){
-            JOptionPane.showMessageDialog(null,"Couldn't connect to FTP Server. ");
-            client = null;
+            //JOptionPane.showMessageDialog(null,"Couldn't connect to FTP Server. ");
+            System.out.println("Couldn't connect to FTP Server. ");
+            //client = null;
             return -1;
         }
 
@@ -49,9 +51,9 @@ public class ftpManager {
 
         BufferedImage temp;
 
-        //Kill program if connection failed
+        //do nothing
         if(openConnection(configFtp) == -1)
-            System.exit(-1);
+            return null;
 
         try{
 
@@ -136,9 +138,9 @@ public class ftpManager {
 
         byte[] temp;
 
-        //Kill program if connection failed
+        //do nothing
         if(openConnection(configFtp) == -1)
-            System.exit(-1);
+            return null;
 
         try{
 
@@ -185,20 +187,16 @@ public class ftpManager {
         String remoteTempImage = "/" + configFtp.roomId + "/" + "bild2.png";
 
         if(openConnection(configFtp) == -1)
-            System.exit(-1);
+            return;
 
         byte[] data = getBytesFromReservedImage(); //bullshit
         data = convertByteArrayToPng(data);
 
 
-        //Changing the main image and deleting the temporary
-        if(openConnection(configFtp) == -1)
-            System.exit(-1);
-
         try{
 
             if(openConnection(configFtp) == -1)
-                System.exit(-1);
+                return;
 
             ByteArrayInputStream bis = new ByteArrayInputStream(data);
             client.setFileType(FTP.BINARY_FILE_TYPE);
@@ -206,7 +204,7 @@ public class ftpManager {
 
 
             if(openConnection(configFtp) == -1)
-                System.exit(-1);
+                return;
 
 
             if(!client.deleteFile(remoteTempImage)){
@@ -223,13 +221,13 @@ public class ftpManager {
         } catch (Exception ex){
             //JOptionPane.showMessageDialog(null,"Couldn't change the temporary image." + client.getReplyString());
             System.out.println("Couldn't change the temporary image." + ex.getMessage());
-            System.exit(-1);
+            return;
         }
 
 
         //Rewriting the config file
         if(openConnection(configFtp) == -1)
-            System.exit(-1);
+            return;
 
         try {
 
@@ -248,7 +246,7 @@ public class ftpManager {
         } catch (Exception ex){
             //JOptionPane.showMessageDialog(null,"Couldn't change the server-sided config. " + client.getReplyString());
             System.out.println("Couldn't change the server-sided config. " + ex.getMessage());
-            System.exit(-1);
+
 
         }
 
