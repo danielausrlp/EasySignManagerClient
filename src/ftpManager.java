@@ -260,9 +260,9 @@ public class ftpManager {
 
         String temp;
 
-        //Kill program if connection failed
+        //do nothing
         if(openConnection(configFtp) == -1){
-            System.exit(-1);
+            return null;
         }
 
         try{
